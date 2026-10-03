@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "aestific-backend",
+  "main": "server/worker.ts",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "aestific_db",
+      // IMPORTANT: Replace <YOUR_D1_DATABASE_ID_HERE> with your real Cloudflare D1 UUID from:
+      // npx wrangler d1 create aestific_db
+      "database_id": "<YOUR_D1_DATABASE_ID_HERE>",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "SUPABASE_BUCKET_NAME": "aestific-files",
+    "BREVO_SENDER_NAME": "Aestific Official"
+  },
+  "triggers": {
+    "crons": ["0 0 * * *"]
+  },
+  "observability": {
+    "enabled": true
+  }
+}

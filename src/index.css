@@ -1,0 +1,754 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap');
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
+@layer base {
+  :root {
+    --bg-main: #000000;
+    --bg-sidebar: #000000;
+    --bg-surface: #0a0a0a;
+    --bg-surface-elevated: #121212;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-focus: rgba(255, 255, 255, 0.2);
+    --text-primary: #ffffff;
+    --text-secondary: #e4e4e7;
+    --text-tertiary: #a1a1aa;
+    --brand-pink: #FF007A;
+    --brand-purple: #A855F7;
+    --brand-blue: #2563EB;
+    --brand-cyan: #00D8FF;
+  }
+
+  body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", "Inter", "Helvetica Neue", Arial, sans-serif;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  /* Accessible focus indicators (excluding composer textarea so no inner border appears on click) */
+  button:focus-visible,
+  a:focus-visible,
+  select:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+  }
+
+  textarea,
+  textarea:focus,
+  textarea:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ==========================================================================
+   THEME ACCESSIBILITY DEFAULTS & SEMANTIC VARIABLES
+   ========================================================================== */
+html.dark, body.dark, [data-theme="dark"] {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+html.light, body.light, [data-theme="light"] {
+  background-color: #ffffff;
+  color: #09090b;
+}
+
+/* User Prompt Card in Chat: Clean, distinguishable query surface */
+.user-prompt-card,
+.user-bubble,
+.user-prompt-box {
+  background-color: #121214 !important;
+  color: #f4f4f5 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.light .user-prompt-card,
+html.light .user-bubble,
+html.light .user-prompt-box {
+  background-color: #f4f4f5 !important;
+  color: #18181b !important;
+  border: 1px solid #e4e4e7 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.user-prompt-card *,
+.user-bubble *,
+.user-prompt-box * {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* ==========================================================================
+   SIGNATURE AESTIFIC FLOWING BORDER EFFECT
+   Default: Minimal monochrome hairline border
+   Focus / Typing: Smooth, slow, elegant PINK → PURPLE → BLUE → CYAN rotation
+   ========================================================================== */
+@keyframes aestific-border-flow {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Base Composer Dock Container - Always deep solid black #000000 */
+.aestific-composer-dock {
+  position: relative;
+  border-radius: 1.5rem;
+  padding: 1.5px;
+  background-color: #000000 !important;
+  overflow: hidden;
+  isolation: isolate;
+  transition: box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+html.light .aestific-composer-dock {
+  background-color: #000000 !important;
+  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Flowing Aestific Gradient Beam:
+   PINK (#FF007A) → PURPLE (#A855F7) → BLUE (#2563EB) → CYAN (#00D8FF) → PINK (#FF007A)
+   Default: Very subtle (opacity: 0.32, paused)
+   Focus / Typing: Smooth animated gradient border (opacity: 1, rotating)
+*/
+.aestific-composer-beam {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 350%;
+  aspect-ratio: 1 / 1;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    #FF007A 0deg,
+    #A855F7 90deg,
+    #2563EB 180deg,
+    #00D8FF 270deg,
+    #FF007A 360deg
+  );
+  animation: aestific-border-flow 8s linear infinite;
+  animation-play-state: paused;
+  pointer-events: none;
+  opacity: 0.32;
+  transition: opacity 0.4s ease;
+  will-change: transform, opacity;
+  transform: translate(-50%, -50%) translateZ(0);
+  z-index: 1;
+}
+
+/* When focused or typing: smooth animated gradient border */
+.aestific-composer-dock:focus-within .aestific-composer-beam,
+.aestific-composer-dock.is-active .aestific-composer-beam {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+.aestific-composer-dock:focus-within,
+.aestific-composer-dock.is-active {
+  box-shadow: 0 6px 24px -4px rgba(168, 85, 247, 0.22), 0 2px 12px -2px rgba(0, 216, 255, 0.16);
+}
+
+html.light .aestific-composer-dock:focus-within,
+html.light .aestific-composer-dock.is-active {
+  box-shadow: 0 8px 30px -4px rgba(168, 85, 247, 0.22), 0 3px 14px -2px rgba(0, 216, 255, 0.16);
+}
+
+/* Inside of composer is solid deep black (#000000) in ALL modes */
+.aestific-composer-inner {
+  position: relative;
+  z-index: 2;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-radius: calc(1.5rem - 1.5px);
+  width: 100%;
+}
+
+@media (max-width: 639px) {
+  .aestific-composer-dock {
+    border-radius: 1.1rem;
+    padding: 1.25px;
+  }
+  .aestific-composer-inner {
+    border-radius: calc(1.1rem - 1.25px);
+  }
+}
+
+html.light .aestific-composer-inner {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Textarea styling: Pure white text, crisp near-white placeholder, white caret, zero inner border */
+.aestific-composer-textarea,
+.aestific-composer-dock textarea,
+.aestific-composer-inner textarea,
+.aestific-composer-textarea:focus,
+.aestific-composer-textarea:focus-visible,
+.aestific-composer-dock textarea:focus,
+.aestific-composer-dock textarea:focus-visible,
+.aestific-composer-inner textarea:focus,
+.aestific-composer-inner textarea:focus-visible {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  font-family: inherit !important;
+  font-weight: 500 !important;
+  background-color: transparent !important;
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Placeholder: WHITE / near-white */
+.aestific-composer-dock textarea::placeholder,
+.aestific-composer-inner textarea::placeholder,
+.aestific-composer-textarea::placeholder {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 0.88 !important;
+  font-weight: 500;
+}
+
+.aestific-composer-dock textarea::-webkit-input-placeholder,
+.aestific-composer-inner textarea::-webkit-input-placeholder,
+.aestific-composer-textarea::-webkit-input-placeholder {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 0.88 !important;
+  font-weight: 500;
+}
+
+.aestific-composer-dock textarea::-moz-placeholder,
+.aestific-composer-inner textarea::-moz-placeholder,
+.aestific-composer-textarea::-moz-placeholder {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 0.88 !important;
+  font-weight: 500;
+}
+
+/* Force all SVG icons inside composer to be white / near-white and NEVER black */
+.aestific-composer-inner svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+/* Ensure buttons and controls inside composer don't inherit light-mode black text */
+.aestific-composer-inner button {
+  color: #ffffff;
+}
+
+html.light .aestific-composer-inner * {
+  border-color: inherit;
+}
+
+/* ==========================================================================
+   AESTIFIC COMPOSER & DOCK STYLING
+   ========================================================================== */
+.aestific-dock-container {
+  position: relative;
+  border-radius: 1.5rem;
+  padding: 1.5px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  isolation: isolate;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.light .aestific-dock-container {
+  background: #e4e4e7;
+  border: 1px solid #e4e4e7;
+}
+
+.aestific-dock-beam {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 320%;
+  aspect-ratio: 1 / 1;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    #ff007a 0deg,
+    #a855f7 90deg,
+    #2563eb 180deg,
+    #00d8ff 270deg,
+    #ff007a 360deg
+  );
+  animation: aestific-border-flow 7.5s linear infinite;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  will-change: transform, opacity;
+  transform: translate(-50%, -50%) translateZ(0);
+  z-index: 1;
+}
+
+.aestific-dock-container:focus-within .aestific-dock-beam,
+.aestific-dock-container.is-active .aestific-dock-beam {
+  opacity: 1;
+}
+
+.aestific-dock-inner {
+  position: relative;
+  z-index: 2;
+  background-color: #000000;
+  border-radius: calc(1.5rem - 1.5px);
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+html.light .aestific-dock-inner {
+  background-color: #ffffff !important;
+}
+
+/* ==========================================================================
+   MINIMALIST MONOCHROME GLASS & SURFACES
+   ========================================================================== */
+.aestific-glass-surface {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.aestific-glass-elevated {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+}
+
+.aestific-interactive-card {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.aestific-interactive-card:hover {
+  background: #121212;
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.aestific-gradient-bg {
+  background: linear-gradient(135deg, #ff007a 0%, #a855f7 50%, #2563eb 100%);
+}
+
+/* Sleek Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   MARKDOWN TYPOGRAPHY & WORKSPACE CONTENT STYLING
+   ========================================================================== */
+.markdown-content {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: #f4f4f5;
+  letter-spacing: 0.005em;
+}
+
+html.light .markdown-content {
+  color: #18181b !important;
+}
+
+.markdown-content p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Headings with clear scale and rhythmic vertical rhythm */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+html.light .markdown-content h1,
+html.light .markdown-content h2,
+html.light .markdown-content h3,
+html.light .markdown-content h4 {
+  color: #09090b !important;
+}
+
+.markdown-content h1 {
+  font-size: 1.375rem;
+  line-height: 1.35;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html.light .markdown-content h1 {
+  border-bottom-color: #e4e4e7 !important;
+}
+
+.markdown-content h2 {
+  font-size: 1.1875rem;
+  line-height: 1.4;
+  margin-top: 1.5rem;
+  margin-bottom: 0.625rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.05rem;
+  line-height: 1.45;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content h4 {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin-top: 1rem;
+  margin-bottom: 0.375rem;
+}
+
+/* Lists with comfortable indent, spacing, and subtle markers */
+.markdown-content ul,
+.markdown-content ol {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+}
+
+.markdown-content li {
+  margin-bottom: 0.35rem;
+  line-height: 1.72;
+  color: #e4e4e7;
+}
+
+html.light .markdown-content li {
+  color: #27272a;
+}
+
+.markdown-content li::marker {
+  color: #71717a;
+}
+
+html.light .markdown-content li::marker {
+  color: #a1a1aa;
+}
+
+.markdown-content li > ul,
+.markdown-content li > ol {
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+  padding-left: 1.25rem;
+}
+
+/* Links */
+.markdown-content a {
+  color: #60a5fa;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.markdown-content a:hover {
+  color: #93c5fd;
+}
+
+html.light .markdown-content a {
+  color: #2563eb;
+}
+
+html.light .markdown-content a:hover {
+  color: #1d4ed8;
+}
+
+/* Strong / Bold */
+.markdown-content strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+html.light .markdown-content strong {
+  color: #09090b !important;
+}
+
+/* Inline Code */
+.markdown-content code:not(pre code) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f4f4f5;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.375rem;
+  font-size: 0.85em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html.light .markdown-content code:not(pre code) {
+  background: #f4f4f5;
+  color: #09090b;
+  border-color: #e4e4e7;
+}
+
+/* Blockquotes */
+.markdown-content blockquote {
+  border-left: 3px solid rgba(255, 255, 255, 0.25);
+  padding: 0.6rem 1rem;
+  margin: 1.1rem 0;
+  color: #d4d4d8;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+html.light .markdown-content blockquote {
+  border-left-color: #18181b;
+  background: #f9f9fb;
+  color: #3f3f46;
+}
+
+/* Tables */
+.markdown-content table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html.light .markdown-content table {
+  border-color: #e4e4e7;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .markdown-content th,
+  .markdown-content td {
+    white-space: normal;
+  }
+}
+
+.markdown-content {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
+}
+
+.markdown-content th {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.markdown-content td {
+  color: #e4e4e7;
+}
+
+html.light .markdown-content th {
+  background: #f4f4f5;
+  color: #09090b;
+  border-color: #e4e4e7;
+}
+
+html.light .markdown-content td {
+  border-color: #e4e4e7;
+  color: #18181b;
+}
+
+/* Code Pre Blocks */
+.markdown-content pre {
+  margin: 1.25rem 0;
+  border-radius: 0.875rem;
+  overflow: hidden;
+  background: #09090b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html.light .markdown-content pre {
+  background: #09090b;
+  border: 1px solid #e4e4e7;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* ==========================================================================
+   AESTIFIC SIGNATURE IMAGE GENERATION ANIMATION
+   Pink (#FF007A) -> Purple (#A855F7) -> Blue (#2563EB) flowing gradient
+   ========================================================================== */
+@keyframes aestific-gradient-travel {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes aestific-light-sweep {
+  0% {
+    transform: translateY(-120%) rotate(25deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.45;
+  }
+  65% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translateY(220%) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes aestific-pulse-soft {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.aestific-image-surface {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 122, 0.12) 0%,
+    rgba(168, 85, 247, 0.16) 35%,
+    rgba(37, 99, 235, 0.14) 70%,
+    rgba(255, 0, 122, 0.12) 100%
+  );
+  background-size: 300% 300%;
+  animation: aestific-gradient-travel 8s ease-in-out infinite;
+}
+
+html.light .aestific-image-surface {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 122, 0.08) 0%,
+    rgba(168, 85, 247, 0.10) 35%,
+    rgba(37, 99, 235, 0.08) 70%,
+    rgba(255, 0, 122, 0.08) 100%
+  );
+  background-size: 300% 300%;
+  animation: aestific-gradient-travel 8s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   REDUCE MOTION (ACCESSIBILITY & USER PREFERENCE)
+   Reduces non-essential movements, page transitions, and floating animations.
+   Strictly preserves critical status indicators (spinners, streaming pulses,
+   image generation progress, toasts).
+   ========================================================================== */
+html.reduce-motion *:not(.keep-motion):not([data-keep-motion]):not([role="status"]):not(.animate-spin):not(.animate-pulse):not(.animate-bounce):not(.loading-indicator):not(.streaming-cursor):not(.progress-bar-indicator),
+html.reduce-motion *:not(.keep-motion):not([data-keep-motion]):not([role="status"]):not(.animate-spin):not(.animate-pulse):not(.animate-bounce):not(.loading-indicator):not(.streaming-cursor):not(.progress-bar-indicator)::before,
+html.reduce-motion *:not(.keep-motion):not([data-keep-motion]):not([role="status"]):not(.animate-spin):not(.animate-pulse):not(.animate-bounce):not(.loading-indicator):not(.streaming-cursor):not(.progress-bar-indicator)::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+html.reduce-motion .aestific-ambient-flow,
+html.reduce-motion .aestific-image-surface,
+html.reduce-motion .aestific-composer-dock::before {
+  animation: none !important;
+}
+
+/* ==========================================================================
+   RESPONSE ANIMATION: INSTANT MODE
+   Disables unnecessary layout sliding, fade transitions, and delayed rendering
+   on chat responses while preserving streaming text flow.
+   ========================================================================== */
+.response-instant,
+.response-instant * {
+  transition: none !important;
+  animation-duration: 0.001ms !important;
+}
+.response-instant pre,
+.response-instant code {
+  animation: none !important;
+}
+
+
+
